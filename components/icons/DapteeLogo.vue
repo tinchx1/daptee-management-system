@@ -108,4 +108,4 @@ defineProps({
     default: 40
   }
 });
-</script>
+</script>svg

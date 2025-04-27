@@ -1,28 +1,55 @@
 <template>
-  <v-navigation-drawer permanent :rail="rail" @mouseenter="rail = false" @mouseleave="rail = true" color="primary"
-    class="side-menu">
+  <v-navigation-drawer
+    permanent
+    :rail="rail"
+    color="primary"
+    class="side-menu max-height-100vh"
+  >
     <div class="d-flex flex-column h-100">
-      <!-- Logo -->
       <div class="pa-4 d-flex justify-center">
-        <DapteeLogo :width="rail ? 40 : 120" :height="rail ? 40 : 40" />
+        <DapteeLogo v-if="!rail" width="220" height="60" />
+        <DapteeLogoMobile v-else />
       </div>
 
-      <!-- Menu items -->
       <v-list nav class="mt-4">
-        <v-list-item to="/" :active="activeModule === 'dashboard'" prepend-icon="mdi-view-dashboard" title="Dashboard"
-          value="dashboard" color="white" />
-
-        <v-list-item to="/users" :active="activeModule === 'users'" prepend-icon="mdi-account-group" title="Users"
-          value="users" color="white" />
-
-        <v-list-item to="/products" :active="activeModule === 'products'" prepend-icon="mdi-package-variant-closed"
-          title="Products" value="products" color="white" />
+        <v-list-item
+          to="/"
+          :active="activeModule === 'dashboard'"
+          prepend-icon="mdi-view-dashboard"
+          title="Dashboard"
+          value="dashboard"
+          color="white"
+        />
+        <v-list-item
+          to="/users"
+          :active="activeModule === 'users'"
+          prepend-icon="mdi-account-group"
+          title="Users"
+          value="users"
+          color="white"
+        />
+        <v-list-item
+          to="/products"
+          :active="activeModule === 'products'"
+          prepend-icon="mdi-package-variant-closed"
+          title="Products"
+          value="products"
+          color="white"
+        />
       </v-list>
 
-      <!-- Footer -->
       <v-spacer />
-      <div class="pa-4 text-center text-caption text-white text-opacity-70">
-        <p>© 2025 Daptee</p>
+
+      <div class="pa-4 text-end text-caption text-white text-opacity-70 ">
+        <v-btn
+          icon
+          size="small"
+          @click="toggleRail"
+          color="white"
+          variant="text"
+        >
+          <v-icon>{{ rail ? 'mdi-chevron-right' : 'mdi-chevron-left' }}</v-icon>
+        </v-btn>
       </div>
     </div>
   </v-navigation-drawer>
@@ -30,13 +57,21 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import DapteeLogo from './DapteeLogo.vue';
+import { useDisplay } from 'vuetify';
+import DapteeLogo from './icons/DapteeLogo.vue';
+import DapteeLogoMobile from './icons/DapteeLogoMobile.vue';
 
-defineProps<{
+const props = defineProps<{
   activeModule: string;
 }>();
 
-const rail = ref(true);
+const { mobile } = useDisplay();
+console.log('mobile', mobile.value);
+const rail = ref(mobile.value || false);
+
+const toggleRail = () => {
+  rail.value = !rail.value;
+};
 </script>
 
 <style scoped>

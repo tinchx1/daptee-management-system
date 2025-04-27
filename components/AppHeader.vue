@@ -1,13 +1,22 @@
 <template>
   <v-app-bar color="white" elevation="1">
-    <template v-slot:prepend>
-      <v-text-field v-model="searchValue" @input="$emit('update:searchQuery', searchValue)"
-        prepend-inner-icon="mdi-magnify" placeholder="Search..." variant="outlined" density="compact" hide-details
-        class="max-width-300"></v-text-field>
-    </template>
+    <v-container class="d-flex justify-center">
+      <!-- Mostrar el input solo si no estamos en '/' -->
+      <v-text-field
+        v-if="showSearch"
+        v-model="searchValue"
+        @input="$emit('update:searchQuery', searchValue)"
+        prepend-inner-icon="mdi-magnify"
+        placeholder="Search..."
+        variant="outlined"
+        density="compact"
+        hide-details
+        style="max-width: 1000px;"
+      ></v-text-field>
+    </v-container>
 
     <v-spacer></v-spacer>
-
+    
     <v-menu location="bottom end">
       <template v-slot:activator="{ props }">
         <v-btn v-bind="props" variant="text">
@@ -18,6 +27,7 @@
           <v-icon>mdi-chevron-down</v-icon>
         </v-btn>
       </template>
+
       <v-list>
         <v-list-item title="My Account" prepend-icon="mdi-account"></v-list-item>
         <v-list-item title="Logout" prepend-icon="mdi-logout" @click="logout"></v-list-item>
@@ -28,7 +38,8 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
+import { useCookie } from 'nuxt/app';
 
 const props = defineProps<{
   searchQuery: string;
@@ -39,33 +50,34 @@ const emit = defineEmits<{
 }>();
 
 const router = useRouter();
+const route = useRoute(); 
+
 const searchValue = ref(props.searchQuery);
 const userName = ref('');
-const userInitial = computed(() => userName.value.charAt(0));
 
-// Get user data from localStorage
-const userData = ref(localStorage.getItem('user'));
-const user = computed(() => userData.value ? JSON.parse(userData.value) : null);
+const showSearch = computed(() => route.path !== '/');
+
+const authCookie = useCookie('is_authenticated');
+const userCookie = useCookie('user_data');
+
+const userInitial = computed(() => userName.value.charAt(0) || '?');
 
 onMounted(() => {
-  if (user.value) {
-    userName.value = user.value.name || user.value.username;
+  try {
+    if (userCookie.value) {
+      const userData = JSON.parse(userCookie.value as string);
+      userName.value = userData.name || userData.username || 'User';
+    }
+  } catch (error) {
+    console.error('Error parsing user data from cookie:', error);
+    userName.value = 'User';
   }
 });
 
 const logout = () => {
-  // Clear authentication data
-  localStorage.removeItem('isAuthenticated');
-  localStorage.removeItem('user');
-  userData.value = null;
-
-  // Redirect to login page
-  router.push('/login');
+  authCookie.value = null;
+  userCookie.value = null;
+  
+  router.replace('/login');
 };
 </script>
-
-<style scoped>
-.max-width-300 {
-  max-width: 300px;
-}
-</style>
