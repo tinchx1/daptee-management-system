@@ -11,7 +11,7 @@
                 <v-icon icon="mdi-account-group" color="primary"></v-icon>
               </v-avatar>
             </template>
-            <v-card-title>Users</v-card-title>
+            <v-card-title>Usuarios</v-card-title>
           </v-card-item>
           
           <v-card-text>
@@ -22,7 +22,7 @@
               to="/users"
               class="px-0"
             >
-              View all users
+              Ver todos los usuarios
               <v-icon icon="mdi-chevron-right" end></v-icon>
             </v-btn>
           </v-card-text>
@@ -37,7 +37,7 @@
                 <v-icon icon="mdi-package-variant-closed" color="primary"></v-icon>
               </v-avatar>
             </template>
-            <v-card-title>Products</v-card-title>
+            <v-card-title>Productos</v-card-title>
           </v-card-item>
           
           <v-card-text>
@@ -48,7 +48,7 @@
               to="/products"
               class="px-0"
             >
-              View all products
+              Ver todos los productos
               <v-icon icon="mdi-chevron-right" end></v-icon>
             </v-btn>
           </v-card-text>
@@ -63,7 +63,7 @@
                 <v-icon icon="mdi-clock-outline" color="primary"></v-icon>
               </v-avatar>
             </template>
-            <v-card-title>Recent Activity</v-card-title>
+            <v-card-title>Actividades recientes</v-card-title>
           </v-card-item>
           
           <v-card-text>
@@ -97,38 +97,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { definePageMeta } from '#imports'
+import { definePageMeta } from '#imports';
+import { useDashboardStats } from '~/composables/dashboard/useDashboardStats';
+import { useRecentActivities } from '~/composables/dashboard/useRecentActivities';
 
 definePageMeta({
   layout: 'dashboard',
   middleware: ['auth']
 });
 
-const userCount = ref(0);
-const productCount = ref(0);
-const isLoading = ref(true);
-const activities = ref([
-  { description: 'User John Doe was added', time: '2 hours ago' },
-  { description: 'Product Laptop X1 was updated', time: '5 hours ago' },
-  { description: 'User Jane Smith was deleted', time: '1 day ago' }
-]);
-
-onMounted(async () => {
-  try {
-    isLoading.value = true;
-    
-    const usersResponse = await fetch('https://jsonplaceholder.typicode.com/users');
-    const users = await usersResponse.json();
-    userCount.value = users.length;
-    
-    const productsResponse = await fetch('https://jsonplaceholder.typicode.com/posts');
-    const products = await productsResponse.json();
-    productCount.value = products.length;
-  } catch (error) {
-    console.error('Error fetching data:', error);
-  } finally {
-    isLoading.value = false;
-  }
-});
+const { userCount, productCount, isLoadingStats, hasError } = useDashboardStats();
+const { activities, isLoading } = useRecentActivities();
 </script>

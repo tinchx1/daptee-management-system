@@ -1,7 +1,13 @@
 <template>
-  <v-app-bar color="white" elevation="1">
-    <v-container class="d-flex justify-center">
-      <!-- Mostrar el input solo si no estamos en '/' -->
+  <v-app-bar
+    app
+    density="comfortable"
+    color="white"
+    elevation="1"
+
+  >
+
+    <v-container class="d-flex justify-center ">
       <v-text-field
         v-if="showSearch"
         v-model="searchValue"
@@ -11,12 +17,11 @@
         variant="outlined"
         density="compact"
         hide-details
-        style="max-width: 1000px;"
-      ></v-text-field>
+      />
     </v-container>
 
-    <v-spacer></v-spacer>
-    
+    <v-spacer />
+
     <v-menu location="bottom end">
       <template v-slot:activator="{ props }">
         <v-btn v-bind="props" variant="text">
@@ -29,8 +34,8 @@
       </template>
 
       <v-list>
-        <v-list-item title="My Account" prepend-icon="mdi-account"></v-list-item>
-        <v-list-item title="Logout" prepend-icon="mdi-logout" @click="logout"></v-list-item>
+        <v-list-item title="Mi Cuenta" prepend-icon="mdi-account" />
+        <v-list-item title="Salir" prepend-icon="mdi-logout" @click="logout" />
       </v-list>
     </v-menu>
   </v-app-bar>
@@ -43,6 +48,7 @@ import { useCookie } from 'nuxt/app';
 
 const props = defineProps<{
   searchQuery: string;
+  rail: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -54,7 +60,6 @@ const route = useRoute();
 
 const searchValue = ref(props.searchQuery);
 const userName = ref('');
-
 const showSearch = computed(() => route.path !== '/');
 
 const authCookie = useCookie('is_authenticated');
@@ -77,7 +82,6 @@ onMounted(() => {
 const logout = () => {
   authCookie.value = null;
   userCookie.value = null;
-  
   router.replace('/login');
 };
 </script>
